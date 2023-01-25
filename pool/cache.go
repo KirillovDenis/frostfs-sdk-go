@@ -14,7 +14,8 @@ type sessionCache struct {
 }
 
 type cacheValue struct {
-	token session.Object
+	token      session.Object
+	expiration uint64
 }
 
 func newCache() (*sessionCache, error) {
@@ -44,9 +45,10 @@ func (c *sessionCache) Get(key string) (session.Object, bool) {
 	return value.token, true
 }
 
-func (c *sessionCache) Put(key string, token session.Object) bool {
+func (c *sessionCache) Put(key string, token session.Object, exp uint64) bool {
 	return c.cache.Add(key, &cacheValue{
-		token: token,
+		token:      token,
+		expiration: exp,
 	})
 }
 
@@ -67,5 +69,5 @@ func (c *sessionCache) updateEpoch(newEpoch uint64) {
 
 func (c *sessionCache) expired(val *cacheValue) bool {
 	epoch := atomic.LoadUint64(&c.currentEpoch)
-	return val.token.ExpiredAt(epoch)
+	return val.expiration <= epoch
 }

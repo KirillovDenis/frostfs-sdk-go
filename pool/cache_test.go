@@ -23,7 +23,7 @@ func TestSessionCache_GetUnmodifiedToken(t *testing.T) {
 	cache, err := newCache()
 	require.NoError(t, err)
 
-	cache.Put(key, target)
+	cache.Put(key, target, 10)
 	value, ok := cache.Get(key)
 	require.True(t, ok)
 	check(t, value, "before sign")
